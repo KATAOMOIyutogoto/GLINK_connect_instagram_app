@@ -8,6 +8,8 @@ import { exchangeCodeForToken, exchangeForLongLivedToken, getUserProfile } from 
 import { saveAccount } from '@/lib/repo/instagramRepo';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');

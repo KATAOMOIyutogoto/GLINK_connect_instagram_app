@@ -8,6 +8,8 @@ import { generateAuthUrl } from '@/lib/instagram';
 import { generateState } from '@/lib/crypto';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // CSRF対策用の state を生成

@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAccount, updateAccountToken } from '@/lib/repo/instagramRepo';
 import { refreshLongLivedToken } from '@/lib/instagram';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
