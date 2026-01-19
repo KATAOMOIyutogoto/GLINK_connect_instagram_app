@@ -3,12 +3,5 @@
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "IG_APP_ID": "@ig_app_id",
-    "IG_APP_SECRET": "@ig_app_secret",
-    "IG_REDIRECT_URI": "@ig_redirect_uri",
-    "IG_SCOPES": "@ig_scopes",
-    "ENCRYPTION_KEY_BASE64": "@encryption_key_base64"
   }
 }
