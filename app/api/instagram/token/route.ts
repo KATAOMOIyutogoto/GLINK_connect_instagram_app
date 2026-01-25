@@ -65,8 +65,8 @@ export async function GET(request: NextRequest) {
       tokenExpiresAt: account.tokenExpiresAt,
       // Botがメディア取得に使用するエンドポイント情報
       endpoints: {
-        media: `https://graph.facebook.com/v18.0/${account.igUserId}/media`,
-        stories: `https://graph.facebook.com/v18.0/${account.igUserId}/stories`,
+        media: `https://graph.instagram.com/${account.igUserId}/media`,
+        stories: `https://graph.instagram.com/${account.igUserId}/stories`,
       },
     });
   } catch (error) {

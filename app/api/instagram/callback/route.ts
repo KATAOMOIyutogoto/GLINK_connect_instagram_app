@@ -74,8 +74,9 @@ export async function GET(request: NextRequest) {
       ? new Date(now.getTime() + expiresIn * 1000).toISOString()
       : undefined;
 
-    // Instagram Graph APIでは userProfile.id がInstagram Business Account ID
-    const igUserId = userProfile.id;
+    // Instagram API with Instagram Loginでは userProfile.id がInstagram Business Account ID
+    // tokenResponse.user_id も使用可能（フォールバック）
+    const igUserId = userProfile.id || tokenResponse.user_id;
     console.log('Saving account:', {
       igUserId,
       username: userProfile.username,

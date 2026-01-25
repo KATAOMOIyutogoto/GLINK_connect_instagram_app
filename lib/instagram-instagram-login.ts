@@ -6,8 +6,6 @@
  * - 顧客はInstagramアカウントだけでログイン可能
  * - Facebookページへの接続が不要
  * - より簡単なオンボーディング
- * 
- * このAPIは投稿・ストーリーのダウンロードに必要です
  */
 
 const IG_OAUTH_BASE = 'https://api.instagram.com/oauth';
@@ -41,8 +39,7 @@ export function getInstagramConfig(): InstagramConfig {
   const appId = process.env.IG_APP_ID;
   const appSecret = process.env.IG_APP_SECRET;
   const redirectUri = process.env.IG_REDIRECT_URI;
-  // 新しいスコープ（Instagram API with Instagram Login用）
-  // 注意: 2025年1月27日以降、古いスコープは非推奨
+  // 新しいスコープ（2025年1月27日以降必須）
   const scopes = process.env.IG_SCOPES?.split(',') || [
     'instagram_business_basic',
   ];
@@ -56,7 +53,7 @@ export function getInstagramConfig(): InstagramConfig {
 
 /**
  * OAuth認可URLを生成（Instagram Login経由）
- * 顧客はInstagramアカウントだけでログイン可能（Facebookアカウント不要）
+ * 顧客はInstagramアカウントだけでログイン可能
  */
 export function generateAuthUrl(state: string): string {
   const config = getInstagramConfig();
@@ -141,7 +138,6 @@ export async function exchangeForLongLivedToken(shortLivedToken: string): Promis
 
 /**
  * ユーザープロフィールを取得
- * Instagram API with Instagram Loginでは、直接Instagramアカウント情報を取得
  */
 export async function getUserProfile(accessToken: string): Promise<UserProfile> {
   try {

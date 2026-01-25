@@ -4,6 +4,11 @@
 
 このアプリは、顧客のInstagramアカウントからアクセストークンを取得・保存し、後続のBotがそのトークンを使用して投稿・ストーリーをダウンロードできるようにします。
 
+**重要**: このアプリは**Instagram API with Instagram Login**を使用しています。
+- ✅ 顧客はInstagramアカウントだけでログイン可能
+- ✅ FacebookアカウントやFacebookページへの接続は不要
+- ✅ より簡単なオンボーディング
+
 ---
 
 ## 🔑 Bot用APIエンドポイント
@@ -29,8 +34,8 @@ GET /api/instagram/token?igUserId={igUserId}
   "expiresIn": 5183944,
   "tokenExpiresAt": "2026-03-20T12:00:00.000Z",
   "endpoints": {
-    "media": "https://graph.facebook.com/v18.0/17841405309211844/media",
-    "stories": "https://graph.facebook.com/v18.0/17841405309211844/stories"
+    "media": "https://graph.instagram.com/17841405309211844/media",
+    "stories": "https://graph.instagram.com/17841405309211844/stories"
   }
 }
 ```
@@ -163,7 +168,7 @@ fs.writeFileSync('video.mp4', buffer);
 // カルーセルの場合、children エンドポイントで子メディアを取得
 if (media.media_type === 'CAROUSEL_ALBUM') {
   const childrenRes = await fetch(
-    `https://graph.facebook.com/v18.0/${media.id}/children?fields=media_url,media_type&access_token=${accessToken}`
+    `https://graph.instagram.com/${media.id}/children?fields=media_url,media_type&access_token=${accessToken}`
   );
   const { data: children } = await childrenRes.json();
   
