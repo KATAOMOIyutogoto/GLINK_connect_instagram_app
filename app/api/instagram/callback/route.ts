@@ -53,8 +53,7 @@ export async function GET(request: NextRequest) {
     let finalAccessToken = tokenResponse.access_token;
     let expiresIn = tokenResponse.expires_in;
 
-    // 2. 短期トークンを長期トークンに交換（Instagram Basic Display API の場合）
-    // 注: Instagram Graph API（ビジネスアカウント）の場合は不要な場合もあります
+    // 2. 短期トークンを長期トークンに交換（Instagram Graph API）
     try {
       console.log('Attempting to exchange for long-lived token...');
       const longLivedResponse = await exchangeForLongLivedToken(tokenResponse.access_token);
@@ -66,7 +65,7 @@ export async function GET(request: NextRequest) {
       // 長期トークン交換に失敗した場合は短期トークンをそのまま使用
     }
 
-    // 3. ユーザープロフィールを取得
+    // 3. ユーザープロフィールを取得（Instagram Graph API経由）
     const userProfile = await getUserProfile(finalAccessToken);
 
     // 4. アカウント情報を保存
@@ -75,18 +74,34 @@ export async function GET(request: NextRequest) {
       ? new Date(now.getTime() + expiresIn * 1000).toISOString()
       : undefined;
 
-    await saveAccount({
-      igUserId: userProfile.id || tokenResponse.user_id,
+    // Instagram Graph APIでは userProfile.id がInstagram Business Account ID
+    const igUserId = userProfile.id;
+    console.log('Saving account:', {
+      igUserId,
       username: userProfile.username,
-      accessToken: finalAccessToken,
+      hasToken: !!finalAccessToken,
       tokenType: tokenResponse.token_type,
       expiresIn,
-      connectedAt: now.toISOString(),
-      tokenExpiresAt,
-      lastRefreshedAt: now.toISOString(),
     });
 
-    console.log('Account saved successfully:', userProfile.id || tokenResponse.user_id);
+    try {
+      await saveAccount({
+        igUserId,
+        username: userProfile.username,
+        accessToken: finalAccessToken,
+        tokenType: tokenResponse.token_type,
+        expiresIn,
+        connectedAt: now.toISOString(),
+        tokenExpiresAt,
+        lastRefreshedAt: now.toISOString(),
+      });
+
+      console.log('✅ Account saved successfully:', igUserId);
+    } catch (saveError) {
+      console.error('❌ Failed to save account:', saveError);
+      const errorDetails = saveError instanceof Error ? saveError.message : String(saveError);
+      throw new Error(`Failed to save account to database: ${errorDetails}`);
+    }
 
     // 5. 接続済みページにリダイレクト
     return NextResponse.redirect(new URL('/connected', request.nextUrl.origin));

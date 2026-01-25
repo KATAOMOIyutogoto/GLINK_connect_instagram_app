@@ -1,6 +1,8 @@
 /**
  * Instagram Graph API 連携ユーティリティ
  * ビジネス/クリエイターアカウント向け
+ * 
+ * このAPIは投稿・ストーリーのダウンロードに必要です
  */
 
 const FB_OAUTH_BASE = 'https://www.facebook.com/v18.0/dialog/oauth';
@@ -155,7 +157,7 @@ export async function getInstagramBusinessAccount(accessToken: string): Promise<
     );
 
     if (!pageWithInstagram) {
-      throw new Error('No Instagram Business Account found');
+      throw new Error('No Instagram Business Account found. Please ensure your Instagram account is connected to a Facebook Page.');
     }
 
     return pageWithInstagram;

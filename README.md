@@ -1,21 +1,38 @@
 # Instagram OAuth 連携アプリ (GLINK_v2)
 
 Next.js (App Router) + TypeScript で構築された、Instagram公式API連携のWebアプリケーションです。  
-複数のInstagramプロアカウントを安全に接続し、後続のBotがアクセストークンを使用できる状態にします。
+
+## 🎯 プロジェクトの目的
+
+**顧客のInstagramストーリーと投稿をダウンロードするためのアクセストークン取得アプリ**
+
+1. **このアプリ**: 顧客がOAuthで接続し、アクセストークンを取得・保存
+2. **後続のBot**: 保存されたトークンを使用して、ストーリーと投稿をダウンロード
+
+**重要**: 投稿・ストーリーのダウンロードには、**Instagram Graph API（ビジネス/クリエイターアカウント）**が必要です。
 
 > **📢 重要**: このプロジェクトは**Supabase (Postgres)** を使用しています。  
 > Vercel KVからの移行については [SUPABASE_MIGRATION.md](./SUPABASE_MIGRATION.md) を参照してください。
 
 ## 🎯 主な機能
 
-- ✅ Instagram OAuth 2.0 認証フロー
+### 顧客向け機能
+- ✅ Instagram OAuth 2.0 認証フロー（Instagram Graph API）
+- ✅ ビジネス/クリエイターアカウント対応
 - ✅ アクセストークンの暗号化保存 (AES-256-GCM)
 - ✅ CSRF対策 (state パラメータ検証)
 - ✅ 長期トークンへの自動交換
 - ✅ 接続済みアカウント一覧表示
 - ✅ トークンリフレッシュ機能
+
+### Bot向け機能
+- ✅ **トークン取得API** (`/api/instagram/token`)
+- ✅ トークンの有効性チェック
+- ✅ メディア取得用エンドポイント情報の提供
+
+### インフラ
 - ✅ **Supabase (Postgres)** によるデータ保存
-- ✅ 将来のBot連携を見据えた拡張可能なDB設計
+- ✅ Bot連携を見据えた拡張可能なDB設計
 - ✅ Vercelへワンクリックデプロイ可能
 
 ## 📁 プロジェクト構造
@@ -214,26 +231,71 @@ curl -X POST http://localhost:3000/api/instagram/refresh \
   -d '{"igUserId": "123456789"}'
 ```
 
-## 🤖 Bot との連携（今後の拡張）
+## 🤖 Bot との連携
 
-保存されたトークンを使用して、Botがメディアやストーリーを取得できます:
+### Bot用APIエンドポイント
 
-```typescript
-import { getAccount } from '@/lib/store';
+#### トークン取得
+```bash
+GET /api/instagram/token?igUserId={igUserId}
+```
 
-// Bot 側の実装例
-async function fetchUserMedia(igUserId: string) {
-  const account = await getAccount(igUserId);
-  if (!account) {
-    throw new Error('Account not found');
+**レスポンス例:**
+```json
+{
+  "success": true,
+  "igUserId": "17841405309211844",
+  "username": "example_user",
+  "accessToken": "EAABwzLix...",
+  "tokenType": "Bearer",
+  "expiresIn": 5183944,
+  "tokenExpiresAt": "2026-03-20T12:00:00.000Z",
+  "endpoints": {
+    "media": "https://graph.facebook.com/v18.0/17841405309211844/media",
+    "stories": "https://graph.facebook.com/v18.0/17841405309211844/stories"
   }
-
-  const response = await fetch(
-    `https://graph.instagram.com/${igUserId}/media?fields=id,caption,media_type,media_url,timestamp&access_token=${account.accessToken}`
-  );
-
-  return await response.json();
 }
+```
+
+### Bot側の実装例
+
+#### 投稿を取得
+```typescript
+// 1. トークンを取得
+const tokenResponse = await fetch(
+  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+);
+const { accessToken, endpoints } = await tokenResponse.json();
+
+// 2. 投稿を取得
+const mediaResponse = await fetch(
+  `${endpoints.media}?fields=id,caption,media_type,media_url,thumbnail_url,timestamp&access_token=${accessToken}`
+);
+const mediaData = await mediaResponse.json();
+```
+
+#### ストーリーを取得
+```typescript
+// 1. トークンを取得
+const tokenResponse = await fetch(
+  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+);
+const { accessToken, endpoints } = await tokenResponse.json();
+
+// 2. ストーリーを取得（24時間以内のもののみ）
+const storiesResponse = await fetch(
+  `${endpoints.stories}?fields=id,media_type,media_url,timestamp&access_token=${accessToken}`
+);
+const storiesData = await storiesResponse.json();
+```
+
+#### メディアファイルをダウンロード
+```typescript
+// 投稿またはストーリーのmedia_urlからダウンロード
+const mediaUrl = mediaData.data[0].media_url;
+const fileResponse = await fetch(mediaUrl);
+const blob = await fileResponse.blob();
+// ファイルとして保存
 ```
 
 ## 🔧 トラブルシューティング

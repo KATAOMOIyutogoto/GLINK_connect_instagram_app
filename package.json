@@ -10,7 +10,8 @@
     "generate-key": "node scripts/generate-encryption-key.js",
     "check-env": "node scripts/check-env.js",
     "setup": "npm run generate-key && npm run check-env",
-    "migrate": "npx tsx scripts/migrate-kv-to-supabase.ts"
+    "migrate": "npx tsx scripts/migrate-kv-to-supabase.ts",
+    "test-supabase": "npx tsx scripts/test-supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",

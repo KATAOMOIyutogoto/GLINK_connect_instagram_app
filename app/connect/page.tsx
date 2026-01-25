@@ -31,11 +31,16 @@ function ConnectContent() {
 
           <div className="mb-8 text-gray-600">
             <p className="mb-4">
-              このボタンをクリックすると、Instagram（Meta）の認証画面に遷移します。
+              このボタンをクリックすると、Facebook（Meta）の認証画面に遷移します。
             </p>
-            <p className="text-sm">
-              ※ Instagram プロアカウントまたはビジネスアカウントが必要です
-            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-left">
+              <p className="font-semibold text-blue-800 mb-2">⚠️ 必要な条件:</p>
+              <ul className="list-disc list-inside space-y-1 text-blue-700">
+                <li>Instagramアカウントが<strong>ビジネスアカウント</strong>または<strong>クリエイターアカウント</strong>であること</li>
+                <li>FacebookページにInstagramアカウントが接続されていること</li>
+                <li>投稿・ストーリーのダウンロードには上記条件が必須です</li>
+              </ul>
+            </div>
           </div>
 
           <button
