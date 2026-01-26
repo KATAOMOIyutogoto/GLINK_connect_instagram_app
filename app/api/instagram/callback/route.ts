@@ -77,6 +77,12 @@ export async function GET(request: NextRequest) {
     // Instagram API with Instagram Loginでは userProfile.id がInstagram Business Account ID
     // tokenResponse.user_id も使用可能（フォールバック）
     const igUserId = userProfile.id || tokenResponse.user_id;
+    
+    if (!igUserId) {
+      console.error('❌ Failed to get Instagram User ID from profile or token response');
+      throw new Error('Instagram User ID is missing');
+    }
+    
     console.log('Saving account:', {
       igUserId,
       username: userProfile.username,
