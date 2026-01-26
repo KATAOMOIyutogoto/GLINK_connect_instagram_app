@@ -57,6 +57,9 @@ export function getInstagramConfig(): InstagramConfig {
 /**
  * OAuth認可URLを生成（Instagram Login経由）
  * 顧客はInstagramアカウントだけでログイン可能（Facebookアカウント不要）
+ * 
+ * 注意: Meta Developer Portalで「Instagram API with Instagram Login」が
+ * 正しく設定されていない場合、Facebook認証画面にリダイレクトされる可能性があります。
  */
 export function generateAuthUrl(state: string): string {
   const config = getInstagramConfig();
@@ -68,7 +71,14 @@ export function generateAuthUrl(state: string): string {
     state,
   });
 
-  return `${IG_OAUTH_BASE}/authorize?${params.toString()}`;
+  const authUrl = `${IG_OAUTH_BASE}/authorize?${params.toString()}`;
+  
+  // デバッグ用: URLが正しく生成されているか確認
+  console.log('🔗 Generated OAuth URL:', authUrl);
+  console.log('📋 Expected base URL: https://api.instagram.com/oauth/authorize');
+  console.log('⚠️  If redirecting to Facebook, check Meta Developer Portal settings');
+  
+  return authUrl;
 }
 
 /**

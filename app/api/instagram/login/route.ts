@@ -27,6 +27,10 @@ export async function GET() {
 
     // Instagram 認可 URL を生成
     const authUrl = generateAuthUrl(state);
+    
+    // デバッグ: 生成されたURLをログ出力
+    console.log('🔗 Generated OAuth URL:', authUrl);
+    console.log('📋 OAuth URL should be: https://api.instagram.com/oauth/authorize');
 
     // 認可URLにリダイレクト
     return NextResponse.redirect(authUrl);
