@@ -80,7 +80,7 @@ GLINK_v2/
 4. **OAuth設定**を構成:
    - **Valid OAuth Redirect URIs** に以下を追加:
      - ローカル: `http://localhost:3000/api/instagram/callback`
-     - 本番: `https://your-domain.vercel.app/api/instagram/callback`
+     - 本番: `https://glink-instagram-oauth.vercel.app/api/instagram/callback`（Vercel Dashboardで確認したプロダクションURLを使用）
 5. **App ID** と **App Secret** をメモ
 
 ### 2. プロジェクトのクローン
@@ -168,7 +168,7 @@ vercel
 4. 環境変数を設定:
    - `IG_APP_ID`
    - `IG_APP_SECRET`
-   - `IG_REDIRECT_URI` (例: `https://your-app.vercel.app/api/instagram/callback`)
+   - `IG_REDIRECT_URI` (例: `https://glink-instagram-oauth.vercel.app/api/instagram/callback` - Vercel Dashboardで確認したプロダクションURLを使用)
    - `IG_SCOPES`
    - `ENCRYPTION_KEY_BASE64`
 5. **Deploy** をクリック
@@ -178,7 +178,7 @@ vercel
 1. Vercel ダッシュボードで **KV** データベースを作成
 2. プロジェクトに KV を接続（環境変数が自動注入されます）
 3. Meta Developer Portal で **Valid OAuth Redirect URIs** を更新:
-   - `https://your-app.vercel.app/api/instagram/callback` を追加
+   - `https://glink-instagram-oauth.vercel.app/api/instagram/callback` を追加（Vercel Dashboardで確認したプロダクションURLを使用）
 
 ## 🔐 セキュリティ
 
@@ -261,9 +261,9 @@ GET /api/instagram/token?igUserId={igUserId}
 
 #### 投稿を取得
 ```typescript
-// 1. トークンを取得
+// 1. トークンを取得（Vercel Dashboardで確認したプロダクションURLを使用）
 const tokenResponse = await fetch(
-  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+  'https://glink-instagram-oauth.vercel.app/api/instagram/token?igUserId=17841405309211844'
 );
 const { accessToken, endpoints } = await tokenResponse.json();
 
@@ -276,9 +276,9 @@ const mediaData = await mediaResponse.json();
 
 #### ストーリーを取得
 ```typescript
-// 1. トークンを取得
+// 1. トークンを取得（Vercel Dashboardで確認したプロダクションURLを使用）
 const tokenResponse = await fetch(
-  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+  'https://glink-instagram-oauth.vercel.app/api/instagram/token?igUserId=17841405309211844'
 );
 const { accessToken, endpoints } = await tokenResponse.json();
 
@@ -333,7 +333,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 Instagram の長期トークンは**60日間**有効です。定期的にリフレッシュが必要です:
 
 ```bash
-curl -X POST https://your-app.vercel.app/api/instagram/refresh \
+curl -X POST https://glink-instagram-oauth.vercel.app/api/instagram/refresh \
   -H "Content-Type: application/json" \
   -d '{"igUserId": "YOUR_IG_USER_ID"}'
 ```

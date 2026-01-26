@@ -62,9 +62,9 @@ GET /api/instagram/token?igUserId={igUserId}
 ### 基本的な取得
 
 ```typescript
-// 1. トークンを取得
+// 1. トークンを取得（Vercel Dashboardで確認したプロダクションURLを使用）
 const tokenRes = await fetch(
-  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+  'https://glink-instagram-oauth.vercel.app/api/instagram/token?igUserId=17841405309211844'
 );
 const { accessToken, endpoints } = await tokenRes.json();
 
@@ -115,9 +115,9 @@ while (nextUrl) {
 ### 基本的な取得
 
 ```typescript
-// 1. トークンを取得
+// 1. トークンを取得（Vercel Dashboardで確認したプロダクションURLを使用）
 const tokenRes = await fetch(
-  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+  'https://glink-instagram-oauth.vercel.app/api/instagram/token?igUserId=17841405309211844'
 );
 const { accessToken, endpoints } = await tokenRes.json();
 
@@ -187,14 +187,14 @@ if (media.media_type === 'CAROUSEL_ALBUM') {
 
 ```typescript
 const tokenRes = await fetch(
-  'https://your-app.vercel.app/api/instagram/token?igUserId=17841405309211844'
+  'https://glink-instagram-oauth.vercel.app/api/instagram/token?igUserId=17841405309211844'
 );
 const data = await tokenRes.json();
 
 if (!data.success && data.error.includes('expired')) {
   // トークンリフレッシュAPIを呼び出す
   const refreshRes = await fetch(
-    'https://your-app.vercel.app/api/instagram/refresh',
+    'https://glink-instagram-oauth.vercel.app/api/instagram/refresh',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -257,9 +257,9 @@ await supabaseAdmin.from('instagram_media').upsert({
 ```typescript
 async function downloadUserMedia(igUserId: string) {
   try {
-    // 1. トークン取得
+    // 1. トークン取得（Vercel Dashboardで確認したプロダクションURLを使用）
     const tokenRes = await fetch(
-      `https://your-app.vercel.app/api/instagram/token?igUserId=${igUserId}`
+      `https://glink-instagram-oauth.vercel.app/api/instagram/token?igUserId=${igUserId}`
     );
     const { accessToken, endpoints } = await tokenRes.json();
     

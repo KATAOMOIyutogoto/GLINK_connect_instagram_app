@@ -3,14 +3,14 @@
  * GET /api/instagram/login
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { generateAuthUrl } from '@/lib/instagram';
 import { generateState } from '@/lib/crypto';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // CSRF対策用の state を生成
     const state = generateState();
@@ -52,7 +52,7 @@ export async function GET() {
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.redirect(
-      new URL('/connect?error=Failed+to+start+OAuth+flow', process.env.IG_REDIRECT_URI || 'http://localhost:3000')
+      new URL('/connect?error=Failed+to+start+OAuth+flow', request.nextUrl.origin)
     );
   }
 }
