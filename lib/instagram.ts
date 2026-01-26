@@ -63,6 +63,15 @@ export function getInstagramConfig(): InstagramConfig {
  */
 export function generateAuthUrl(state: string): string {
   const config = getInstagramConfig();
+  
+  // デバッグ: 設定値を確認
+  console.log('🔧 Instagram Config:', {
+    appId: config.appId,
+    redirectUri: config.redirectUri,
+    scopes: config.scopes,
+    oauthBase: IG_OAUTH_BASE,
+  });
+  
   const params = new URLSearchParams({
     client_id: config.appId,
     redirect_uri: config.redirectUri,
@@ -76,7 +85,14 @@ export function generateAuthUrl(state: string): string {
   // デバッグ用: URLが正しく生成されているか確認
   console.log('🔗 Generated OAuth URL:', authUrl);
   console.log('📋 Expected base URL: https://api.instagram.com/oauth/authorize');
-  console.log('⚠️  If redirecting to Facebook, check Meta Developer Portal settings');
+  console.log('📋 Actual base URL:', authUrl.split('?')[0]);
+  console.log('⚠️  If URL starts with https://www.facebook.com, check Meta Developer Portal settings');
+  
+  // URLの検証
+  if (authUrl.startsWith('https://www.facebook.com')) {
+    console.error('❌ ERROR: URL is redirecting to Facebook! This should not happen.');
+    console.error('❌ Check Meta Developer Portal settings for "Instagram API with Instagram Login"');
+  }
   
   return authUrl;
 }

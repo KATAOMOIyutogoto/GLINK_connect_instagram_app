@@ -8,7 +8,7 @@ const nextConfig = {
     IG_APP_ID: process.env.IG_APP_ID || 'dummy-app-id',
     IG_APP_SECRET: process.env.IG_APP_SECRET || 'dummy-app-secret',
     IG_REDIRECT_URI: process.env.IG_REDIRECT_URI || 'http://localhost:3000/api/instagram/callback',
-    IG_SCOPES: process.env.IG_SCOPES || 'instagram_basic',
+    IG_SCOPES: process.env.IG_SCOPES || 'instagram_business_basic',
     ENCRYPTION_KEY_BASE64: process.env.ENCRYPTION_KEY_BASE64 || 'dGhpc2lzYWR1bW15a2V5Zm9yYnVpbGR0aW1lMzJieXRlcw==',
   },
 }

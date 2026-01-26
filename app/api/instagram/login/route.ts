@@ -25,12 +25,27 @@ export async function GET() {
       path: '/',
     });
 
+    // 環境変数を確認
+    console.log('🔍 Environment Variables Check:');
+    console.log('  IG_APP_ID:', process.env.IG_APP_ID ? '✅ Set' : '❌ Missing');
+    console.log('  IG_APP_SECRET:', process.env.IG_APP_SECRET ? '✅ Set' : '❌ Missing');
+    console.log('  IG_REDIRECT_URI:', process.env.IG_REDIRECT_URI || '❌ Missing');
+    console.log('  IG_SCOPES:', process.env.IG_SCOPES || '❌ Missing (will use default: instagram_business_basic)');
+    
     // Instagram 認可 URL を生成
     const authUrl = generateAuthUrl(state);
     
     // デバッグ: 生成されたURLをログ出力
-    console.log('🔗 Generated OAuth URL:', authUrl);
-    console.log('📋 OAuth URL should be: https://api.instagram.com/oauth/authorize');
+    console.log('🔗 Final OAuth URL:', authUrl);
+    console.log('📋 URL starts with:', authUrl.split('?')[0]);
+    
+    // URL検証
+    if (!authUrl.startsWith('https://api.instagram.com/oauth/authorize')) {
+      console.error('❌ CRITICAL ERROR: OAuth URL is incorrect!');
+      console.error('❌ Expected: https://api.instagram.com/oauth/authorize');
+      console.error('❌ Actual:', authUrl.split('?')[0]);
+      throw new Error('Invalid OAuth URL generated. Check configuration.');
+    }
 
     // 認可URLにリダイレクト
     return NextResponse.redirect(authUrl);

@@ -31,7 +31,7 @@ function ConnectContent() {
 
           <div className="mb-8 text-gray-600">
             <p className="mb-4">
-              このボタンをクリックすると、Instagram（Meta）の認証画面に遷移します。
+              このボタンをクリックすると、Instagramの認証画面に遷移します。
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-left">
               <p className="font-semibold text-blue-800 mb-2">✅ 必要な条件:</p>

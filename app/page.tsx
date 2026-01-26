@@ -33,7 +33,7 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-4">使い方</h2>
             <ol className="list-decimal list-inside space-y-2 text-gray-700">
               <li>「Instagram を接続」ボタンをクリック</li>
-              <li>Instagram（Meta）のOAuth画面で認証・同意</li>
+              <li>InstagramのOAuth画面で認証・同意</li>
               <li>コールバック後、アクセストークンが暗号化されて保存されます</li>
               <li>接続済みアカウント一覧で状態を確認できます</li>
               <li>後続のBotが <code className="bg-gray-100 px-1 rounded">/api/instagram/token</code> からトークンを取得して使用します</li>
