@@ -141,21 +141,27 @@ export async function exchangeForLongLivedToken(shortLivedToken: string): Promis
  */
 export async function getUserProfile(accessToken: string): Promise<UserProfile> {
   try {
-    const response = await fetch(
-      `${IG_GRAPH_BASE}/me?fields=id,username&access_token=${accessToken}`,
-      { method: 'GET' }
-    );
+    // 最小限のフィールド（idのみ）でリクエスト
+    const url = `${IG_GRAPH_BASE}/me?fields=id&access_token=${accessToken}`;
+    console.log('🔍 Fetching user profile:', url.replace(accessToken, 'HIDDEN'));
+
+    const response = await fetch(url, { method: 'GET' });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Failed to fetch user profile:', errorText);
-      throw new Error(`Failed to fetch user profile: ${response.status}`);
+      console.error('❌ Failed to fetch user profile:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText
+      });
+      throw new Error(`Failed to fetch user profile: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('✅ User profile fetched:', data);
     return data as UserProfile;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('❌ Error fetching user profile:', error);
     throw error;
   }
 }
