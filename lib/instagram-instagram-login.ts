@@ -83,6 +83,7 @@ export async function exchangeCodeForToken(code: string): Promise<TokenResponse>
   });
 
   try {
+    console.log('🔄 Exchanging code for token...');
     const response = await fetch(`${IG_OAUTH_BASE}/access_token`, {
       method: 'POST',
       headers: {
@@ -93,14 +94,19 @@ export async function exchangeCodeForToken(code: string): Promise<TokenResponse>
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Token exchange failed:', errorText);
-      throw new Error(`Token exchange failed: ${response.status}`);
+      console.error('❌ Token exchange failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText
+      });
+      throw new Error(`Token exchange failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('✅ Token exchanged successfully, user_id:', data.user_id);
     return data as TokenResponse;
   } catch (error) {
-    console.error('Error exchanging code for token:', error);
+    console.error('❌ Error exchanging code for token:', error);
     throw error;
   }
 }

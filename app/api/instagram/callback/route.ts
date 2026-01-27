@@ -59,14 +59,16 @@ export async function GET(request: NextRequest) {
       const longLivedResponse = await exchangeForLongLivedToken(tokenResponse.access_token);
       finalAccessToken = longLivedResponse.access_token;
       expiresIn = longLivedResponse.expires_in;
-      console.log('Long-lived token obtained');
+      console.log('✅ Long-lived token obtained, expires_in:', expiresIn);
     } catch (longLivedError) {
-      console.warn('Long-lived token exchange failed (using short-lived token):', longLivedError);
+      console.warn('⚠️  Long-lived token exchange failed (using short-lived token):', longLivedError);
       // 長期トークン交換に失敗した場合は短期トークンをそのまま使用
     }
 
     // 3. ユーザープロフィールを取得（Instagram Graph API経由）
+    console.log('📋 Attempting to fetch user profile...');
     const userProfile = await getUserProfile(finalAccessToken);
+    console.log('✅ User profile fetched:', userProfile);
 
     // 4. アカウント情報を保存
     const now = new Date();
