@@ -49,9 +49,14 @@ export async function GET(request: NextRequest) {
     // 1. 認可コードをアクセストークンに交換
     console.log('Exchanging code for token...');
     const tokenResponse = await exchangeCodeForToken(code);
+    console.log('Token response:', {
+      user_id: tokenResponse.user_id,
+      expires_in: tokenResponse.expires_in
+    });
 
     let finalAccessToken = tokenResponse.access_token;
     let expiresIn = tokenResponse.expires_in;
+    let igUserId = tokenResponse.user_id; // Instagram User IDをトークンレスポンスから取得
 
     // 2. 短期トークンを長期トークンに交換（Instagram Graph API）
     try {
@@ -65,10 +70,21 @@ export async function GET(request: NextRequest) {
       // 長期トークン交換に失敗した場合は短期トークンをそのまま使用
     }
 
-    // 3. ユーザープロフィールを取得（Instagram Graph API経由）
-    console.log('📋 Attempting to fetch user profile...');
-    const userProfile = await getUserProfile(finalAccessToken);
-    console.log('✅ User profile fetched:', userProfile);
+    // 3. ユーザープロフィールを取得（オプション - usernameを取得するため）
+    let username: string | undefined;
+    try {
+      console.log('📋 Attempting to fetch user profile for username...');
+      const userProfile = await getUserProfile(finalAccessToken);
+      console.log('✅ User profile fetched:', userProfile);
+      username = userProfile.username;
+      // user_idがまだない場合はここで取得
+      if (!igUserId) {
+        igUserId = userProfile.id;
+      }
+    } catch (profileError) {
+      console.warn('⚠️  Failed to fetch user profile (will use user_id from token):', profileError);
+      // usernameは取得できないが、user_idがあれば続行可能
+    }
 
     // 4. アカウント情報を保存
     const now = new Date();
@@ -76,18 +92,15 @@ export async function GET(request: NextRequest) {
       ? new Date(now.getTime() + expiresIn * 1000).toISOString()
       : undefined;
 
-    // Instagram API with Instagram Loginでは userProfile.id がInstagram Business Account ID
-    // tokenResponse.user_id も使用可能（フォールバック）
-    const igUserId = userProfile.id || tokenResponse.user_id;
-    
+    // Instagram User IDの検証
     if (!igUserId) {
-      console.error('❌ Failed to get Instagram User ID from profile or token response');
+      console.error('❌ Failed to get Instagram User ID from token response');
       throw new Error('Instagram User ID is missing');
     }
-    
+
     console.log('Saving account:', {
       igUserId,
-      username: userProfile.username,
+      username,
       hasToken: !!finalAccessToken,
       tokenType: tokenResponse.token_type,
       expiresIn,
@@ -96,7 +109,7 @@ export async function GET(request: NextRequest) {
     try {
       await saveAccount({
         igUserId,
-        username: userProfile.username,
+        username,
         accessToken: finalAccessToken,
         tokenType: tokenResponse.token_type,
         expiresIn,
