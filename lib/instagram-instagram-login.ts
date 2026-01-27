@@ -142,7 +142,7 @@ export async function exchangeForLongLivedToken(shortLivedToken: string): Promis
 export async function getUserProfile(accessToken: string): Promise<UserProfile> {
   try {
     const response = await fetch(
-      `${IG_GRAPH_BASE}/me?fields=id,username,account_type&access_token=${accessToken}`,
+      `${IG_GRAPH_BASE}/me?fields=id,username&access_token=${accessToken}`,
       { method: 'GET' }
     );
 
