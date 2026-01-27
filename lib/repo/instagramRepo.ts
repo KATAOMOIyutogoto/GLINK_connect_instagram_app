@@ -180,6 +180,8 @@ export async function getAccount(igUserId: string): Promise<InstagramAccount | n
  * 接続済みアカウント一覧を取得（トークンは含まない）
  */
 export async function listAccounts(): Promise<InstagramAccountView[]> {
+  console.log('📋 Fetching accounts list...');
+
   // JOINして一括取得
   const { data, error } = await supabaseAdmin
     .from('instagram_accounts')
@@ -200,9 +202,12 @@ export async function listAccounts(): Promise<InstagramAccountView[]> {
     .order('connected_at', { ascending: false });
 
   if (error) {
-    console.error('Failed to list accounts:', error);
+    console.error('❌ Failed to list accounts:', error);
     throw new Error(`Failed to list accounts: ${error.message}`);
   }
+
+  console.log('✅ Accounts fetched:', data?.length || 0, 'accounts');
+  console.log('Raw data:', JSON.stringify(data, null, 2));
 
   return (data || []).map((row: any) => ({
     igUserId: row.ig_user_id,
