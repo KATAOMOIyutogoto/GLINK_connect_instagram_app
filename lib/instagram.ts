@@ -170,22 +170,31 @@ export async function exchangeForLongLivedToken(shortLivedToken: string): Promis
  * Instagram API with Instagram Loginでは、直接Instagramアカウント情報を取得
  */
 export async function getUserProfile(accessToken: string): Promise<UserProfile> {
+  const url = `${IG_GRAPH_BASE}/me?fields=id,username,account_type&access_token=${accessToken}`;
+  console.log('🔍 Fetching user profile from:', url.replace(accessToken, '[REDACTED]'));
+
   try {
-    const response = await fetch(
-      `${IG_GRAPH_BASE}/me?fields=id,username,account_type&access_token=${accessToken}`,
-      { method: 'GET' }
-    );
+    const response = await fetch(url, { method: 'GET' });
+
+    const responseText = await response.text();
+    console.log('📥 User profile API response status:', response.status);
+    console.log('📥 User profile API response body:', responseText);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Failed to fetch user profile:', errorText);
-      throw new Error(`Failed to fetch user profile: ${response.status}`);
+      console.error('❌ Failed to fetch user profile:', responseText);
+      throw new Error(`Failed to fetch user profile: ${response.status} - ${responseText}`);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
+    console.log('✅ Parsed user profile:', JSON.stringify(data, null, 2));
+
+    if (!data.username) {
+      console.warn('⚠️ Username not found in API response. Available fields:', Object.keys(data));
+    }
+
     return data as UserProfile;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('❌ Error fetching user profile:', error);
     throw error;
   }
 }

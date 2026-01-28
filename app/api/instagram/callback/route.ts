@@ -70,20 +70,28 @@ export async function GET(request: NextRequest) {
       // 長期トークン交換に失敗した場合は短期トークンをそのまま使用
     }
 
-    // 3. ユーザープロフィールを取得（オプション - usernameを取得するため）
+    // 3. ユーザープロフィールを取得（usernameとaccount_typeを取得）
     let username: string | undefined;
+    let accountType: string | undefined;
     try {
-      console.log('📋 Attempting to fetch user profile for username...');
+      console.log('📋 Fetching user profile for username and account_type...');
       const userProfile = await getUserProfile(finalAccessToken);
-      console.log('✅ User profile fetched:', userProfile);
+      console.log('✅ User profile fetched:', JSON.stringify(userProfile, null, 2));
+
       username = userProfile.username;
+      accountType = userProfile.account_type;
+
+      console.log('📝 Extracted values - username:', username, ', account_type:', accountType);
+
       // user_idがまだない場合はここで取得
       if (!igUserId) {
         igUserId = userProfile.id;
+        console.log('📝 Using user_id from profile:', igUserId);
       }
     } catch (profileError) {
-      console.warn('⚠️  Failed to fetch user profile (will use user_id from token):', profileError);
-      // usernameは取得できないが、user_idがあれば続行可能
+      console.error('❌ Failed to fetch user profile:', profileError);
+      // プロフィール取得失敗でもuser_idがあれば続行可能（usernameはnull）
+      console.warn('⚠️ Continuing without username (user_id from token):', igUserId);
     }
 
     // 4. アカウント情報を保存
@@ -101,6 +109,7 @@ export async function GET(request: NextRequest) {
     console.log('Saving account:', {
       igUserId,
       username,
+      accountType,
       hasToken: !!finalAccessToken,
       tokenType: tokenResponse.token_type,
       expiresIn,
@@ -110,6 +119,7 @@ export async function GET(request: NextRequest) {
       await saveAccount({
         igUserId,
         username,
+        accountType,
         accessToken: finalAccessToken,
         tokenType: tokenResponse.token_type,
         expiresIn,

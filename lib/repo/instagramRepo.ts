@@ -12,6 +12,7 @@ import { encrypt, decrypt } from '@/lib/crypto';
 export interface InstagramAccount {
   igUserId: string;
   username?: string;
+  accountType?: string;
   accessToken: string; // 復号化済み
   tokenType: string;
   scopes?: string[];
@@ -43,6 +44,7 @@ export async function saveAccount(account: InstagramAccount): Promise<void> {
   const {
     igUserId,
     username,
+    accountType,
     accessToken,
     tokenType,
     scopes,
@@ -52,6 +54,13 @@ export async function saveAccount(account: InstagramAccount): Promise<void> {
     lastRefreshedAt,
   } = account;
 
+  console.log('💾 Saving account to Supabase:', {
+    igUserId,
+    username,
+    accountType,
+    hasToken: !!accessToken,
+  });
+
   // 1. instagram_accounts をupsert
   const { data: accountData, error: accountError } = await supabaseAdmin
     .from('instagram_accounts')
@@ -59,6 +68,7 @@ export async function saveAccount(account: InstagramAccount): Promise<void> {
       {
         ig_user_id: igUserId,
         ig_username: username || null,
+        account_type: accountType || null,
         connected_at: connectedAt,
         last_seen_at: new Date().toISOString(),
       },
